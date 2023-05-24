@@ -110,9 +110,14 @@ void setMotor(char side, byte pwm) {
 void setup() {
   setPWMfrequency(0x02);// timers at 7.81KHz once again to quiet motors
 
-  pinMode(THREELEGButton, INPUT);
-  pinMode(TWOLEGButton, INPUT);
-  pinMode(THREELEGSLOWButton, INPUT);
+  pinMode(THREELEGButton, INPUT_PULLUP);
+  pinMode(TWOLEGButton, INPUT_PULLUP);
+  pinMode(THREELEGSLOWButton, INPUT_PULLUP);
+
+  pinMode(Shoulder3Limit, INPUT_PULLUP);
+  pinMode(Shoulder2Limit, INPUT_PULLUP);
+  pinMode(CenterLeg3Limit,INPUT_PULLUP);
+  pinMode(CenterLeg2Limit,INPUT_PULLUP);
 
 
   pinMode(RPWMS, OUTPUT); //Shoulder
@@ -138,7 +143,7 @@ void setup() {
 }
   void loop() {
     if (state == 0) {
-      if (digitalRead(THREELEGButton) == HIGH) {
+      if (digitalRead(THREELEGButton) == LOW) {
         Serial.println("Begin two leg to three leg fast transition. Deploy center leg, rotate shoulder.");
         state = 6;
         TransitionStarted = millis();
@@ -147,7 +152,7 @@ void setup() {
         Serial.print("state - ");Serial.println(state);
       }
 
-      if (digitalRead(THREELEGSLOWButton) == HIGH) {
+      if (digitalRead(THREELEGSLOWButton) == LOW) {
         Serial.println("Begin two leg to three leg slow transition. Deploy center leg.");
         TransitionStarted = millis();
         setMotor('C', 150); //Center leg deploy
@@ -155,7 +160,7 @@ void setup() {
         Serial.print("state - ");Serial.println(state);
       }
 
-      if (digitalRead(TWOLEGButton) == HIGH) {
+      if (digitalRead(TWOLEGButton) == LOW) {
         Serial.println("Begin three leg to two leg transition. Rotate shoulder.");
         TransitionStarted = millis();
         setMotor('B', 250); //Shoulder rotate to 2 leg position, was 210
@@ -169,7 +174,7 @@ void setup() {
 
     if (state == 1) {
 
-      if (CenterLeg3LimitTriggered == false && digitalRead(CenterLeg3Limit) == HIGH) {
+      if (CenterLeg3LimitTriggered == false && digitalRead(CenterLeg3Limit) == LOW) {
         CenterLeg3LimitTriggered = true;
         Serial.println("Center leg motor locked in 3 leg postion. Rotate shoulder.");
         setMotor('C', 0);   //Stop center leg motor
@@ -181,7 +186,7 @@ void setup() {
 
     if (state == 2) {
 
-      if (Shoulder2LimitTriggered == false && digitalRead(Shoulder2Limit) == HIGH) {
+      if (Shoulder2LimitTriggered == false && digitalRead(Shoulder2Limit) == LOW) {
         Shoulder2LimitTriggered = true;
         setMotor('B', 0); //Stop shoulder motor
         Serial.println("Shoulder locked in two leg position.");
@@ -199,7 +204,7 @@ void setup() {
     }
 
     if (state == 4) {
-      if (CenterLeg2LimitTriggered == false && digitalRead(CenterLeg2Limit) == HIGH) {
+      if (CenterLeg2LimitTriggered == false && digitalRead(CenterLeg2Limit) == LOW) {
         CenterLeg2LimitTriggered = true;
         Serial.println("Center leg retracted. Transition complete.");
         setMotor('D', 0); //Stop Center leg
@@ -207,7 +212,7 @@ void setup() {
     }
 
     if (state == 5) {
-      if (Shoulder3LimitTriggered == false && digitalRead(Shoulder3Limit) == HIGH) {
+      if (Shoulder3LimitTriggered == false && digitalRead(Shoulder3Limit) == LOW) {
         Shoulder3LimitTriggered = true;
         Serial.println("Shoulder motor locked in 3 leg postion.");
         setMotor('A', 0); //Stop shoulder motor
@@ -221,13 +226,13 @@ void setup() {
     }
 
     if (state == 6) {
-      if (CenterLeg3LimitTriggered == false && digitalRead(CenterLeg3Limit) == HIGH) {
+      if (CenterLeg3LimitTriggered == false && digitalRead(CenterLeg3Limit) == LOW) {
         CenterLeg3LimitTriggered = true;
         setMotor('C', 0); //Stop center leg motor
         Serial.println("Center leg motor locked in 3 leg postion.");
       }
 
-      if (Shoulder3LimitTriggered == false && digitalRead(Shoulder3Limit) == HIGH) {
+      if (Shoulder3LimitTriggered == false && digitalRead(Shoulder3Limit) == LOW) {
         Shoulder3LimitTriggered = true;
         setMotor('A', 0); //Stop shoulder motor
         Serial.println("Shoulder motor locked in 3 leg postion.");
